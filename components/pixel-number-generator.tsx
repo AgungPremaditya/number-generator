@@ -30,30 +30,31 @@ export default function PixelNumberGenerator() {
     // Fetch data from API POST METHOD (Generate button)
     const generateMutation = useMutation({
         mutationFn: async (digit: number) => {
-            if (digit <= 20) throw new Error(`API error: overlimit`);
-            const response = await fetch(
-                `https://snqvpcpc6zmlfvn4k4xl4qfgoy0vaeve.lambda-url.ap-southeast-1.on.aws/run-generate`,
-                {
-                    method: "POST",
-                    headers: {
-                        "Content-Type": "application/json",
-                    },
-                    body: JSON.stringify({
-                        digit,
-                    }),
-                }
-            );
+            if (digit >= 20) throw new Error(`API error: overlimit`);
+            try {
+                const response = await fetch(
+                    `https://snqvpcpc6zmlfvn4k4xl4qfgoy0vaeve.lambda-url.ap-southeast-1.on.aws/run-generate`,
+                    {
+                        method: "POST",
+                        headers: {
+                            "Content-Type": "application/json",
+                        },
+                        body: JSON.stringify({
+                            digit,
+                        }),
+                    }
+                );
 
-            if (!response.ok) {
-                throw new Error(`API error: ${response.status}`);
+                return response.json();
+            } catch (e) {
+                console.log("[POST] error :" + e);
             }
-
-            return response.json();
         },
     });
 
     const generateQuery = useGenerateData();
-    console.log(generateQuery);
+
+    console.log("[POST] status: ", generateMutation.status);
 
     return (
         <div className="w-full max-w-md">
